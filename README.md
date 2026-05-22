@@ -1,70 +1,61 @@
-
 # ECVAMM
 
-Ecvamm is a lightweight mod editor for Mindustry that allows you to create and manage game content such as items, units, and blocks through a simple and intuitive UI.
+A lightweight mod editor for [Mindustry](https://github.com/Anuken/Mindustry) — create and manage game content like items, units, and blocks through a simple, intuitive UI.
+
+> ⚠️ Early development — some features may be incomplete or unstable.
 
 ---
 
-## 🚀 How to Use
+## Requirements
 
-### 1. Install dependencies
+- Python 3.10+
+- PyQt6
+- hjson
+
+---
+
+## Getting Started
+
+**1. Install dependencies**
 
 ```bash
 pip install PyQt6 hjson
-````
+```
 
-### 2. Run the application
+**2. Run the application**
 
 ```bash
 python main.py
 ```
 
-> ⚠️ Some features may not work properly yet. This is the first version of the project and it is still under active development.
+---
+
+## Planned Features
+
+| Feature | Description | Status |
+|---|---|---|
+| Item & Block editor | Fix and improve existing editors | In Progress |
+| Settings system | Configurable settings menu | Planned |
+| In-game content editing | Modify existing game content | Planned |
+| Better UI explanations | Improved tooltips and descriptions | Planned |
+| Additional tools | More features and improvements | TBD |
 
 ---
 
-## 🧩 Project Status
+## Community
 
-Ecvamm is currently in early development. Features are being added and improved over time.
+Join the Discord to report bugs, suggest ideas, share feedback, or help improve the project.
 
-You can join the Discord community to:
-
-* Report bugs
-* Suggest ideas
-* Help improve the project
-* Share feedback
+👉 **[discord](https://discord.gg/xrbQZ3JkJH)**
 
 ---
 
-## 📌 Planned Features
+## Contributing
 
-| Feature                          | Description                       | Status      |
-| -------------------------------- | --------------------------------- | ----------- |
-| Item & Block editor improvements | Fix and improve existing editors  | In progress |
-| Settings system                  | Add configurable settings menu    | Planned     |
-| In-game content editing          | Modify existing game content      | Planned     |
-| Better UI explanations           | Improve tooltips and descriptions | Planned     |
-| Additional features              | More tools and improvements       | Unknown     |
+Contributions are welcome — fork the repo and open a pull request.
 
 ---
 
-## ℹ️ About
+## About
 
-Ecvamm™ is developed by KaviunDurs.
-
-This project is in active development and may contain bugs or incomplete features.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome. Feel free to fork the repository and submit pull requests.
-
----
-
-## 📦 Requirements
-
-* Python 3.10+
-* PyQt6
-* hjson
-
+ECVAMM™ is developed by **KaviunDurs**. Active development ongoing; expect bugs and incomplete features.
