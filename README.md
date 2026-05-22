@@ -4,7 +4,7 @@ A lightweight mod editor for [Mindustry](https://github.com/Anuken/Mindustry) �
 
 > ⚠️ Early development — some features may be incomplete or unstable.
 
----
+
 
 ## Requirements
 
@@ -12,7 +12,7 @@ A lightweight mod editor for [Mindustry](https://github.com/Anuken/Mindustry) �
 - PyQt6
 - hjson
 
----
+
 
 ## Getting Started
 
@@ -28,7 +28,7 @@ pip install PyQt6 hjson
 python main.py
 ```
 
----
+
 
 ## Planned Features
 
@@ -40,7 +40,7 @@ python main.py
 | Better UI explanations | Improved tooltips and descriptions | Planned |
 | Additional tools | More features and improvements | TBD |
 
----
+
 
 ## Community
 
@@ -48,13 +48,13 @@ Join the Discord to report bugs, suggest ideas, share feedback, or help improve 
 
 👉 **[discord](https://discord.gg/xrbQZ3JkJH)**
 
----
+
 
 ## Contributing
 
 Contributions are welcome — fork the repo and open a pull request.
 
----
+
 
 ## About
 
