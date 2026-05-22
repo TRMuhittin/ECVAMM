@@ -1,6 +1,4 @@
-İşte direkt kopyalayıp `README.md` olarak koyabileceğin **tek parça, temiz ve GitHub uyumlu versiyon:**
 
-````md
 # ECVAMM
 
 Ecvamm is a lightweight mod editor for Mindustry that allows you to create and manage game content such as items, units, and blocks through a simple and intuitive UI.
