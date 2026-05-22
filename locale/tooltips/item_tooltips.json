@@ -1,0 +1,21 @@
+{
+    "name": "The internal ID of the item. Used in code and HJSON references. No spaces allowed.",
+    "displayName": "The name shown to players in-game.",
+    "description": "Short description shown in the item info panel. Supports color tags like [#ff0000]red[].",
+    "details": "Extended description shown when the player clicks for more info.",
+    "color": "The color of the item displayed in-game, in hex format.",
+    "hardness": "How hard this item is to mine. Higher values require better drills.",
+    "cost": "Base material cost. Affects how long buildings that use this item take to construct.",
+    "explosiveness": "How explosive this item is. High values cause explosions when the item burns.",
+    "flammability": "How flammable this item is. Values above 0.3 make it eligible for item burners.",
+    "radioactivity": "How radioactive this item is. Affects nearby units and buildings.",
+    "charge": "How electrically potent this item is.",
+    "healthScaling": "Multiplies the default health of buildings that require this item.",
+    "frames": "If greater than 0, this item is animated with this many frames.",
+    "transitionFrames": "Number of generated transition frames between each animation frame.",
+    "frameTime": "Ticks between each animation frame.",
+    "lowPriority": "If enabled, drills will only mine this item when nothing else is available.",
+    "buildable": "If disabled, this item cannot be used in building construction and will be incinerated in cores.",
+    "hidden": "If enabled, this item is hidden from the player.",
+    "research": "The ID of the item or block that must be researched before this item unlocks."
+}
