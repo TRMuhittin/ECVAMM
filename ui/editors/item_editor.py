@@ -4,13 +4,23 @@ from PyQt6.QtWidgets import (
     QFormLayout, QLineEdit, QLabel,
     QPushButton, QFileDialog, QSpinBox,
     QDoubleSpinBox, QScrollArea, QColorDialog,
-    QCheckBox, QMessageBox, QMenu, QApplication
+    QCheckBox, QMessageBox, QMenu, QApplication,
+    QCompleter
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QStringListModel
 from PyQt6.QtGui import QPixmap, QColor, QAction
 import os
-import json
 import hjson
+from locale.locale_manager import tr
+
+
+MINDUSTRY_ITEMS = [
+    "copper", "lead", "graphite", "metaglass", "titanium",
+    "thorium", "plastanium", "phase-fabric", "surge-alloy",
+    "silicon", "pyratite", "blast-compound", "spore-pod",
+    "beryllium", "tungsten", "oxide", "carbide",
+    "fissile-matter", "sand", "scrap", "coal",  
+]
 
 
 OPTIONAL_PROPERTIES = {
@@ -48,17 +58,6 @@ PROPERTY_LABELS = {
 }
 
 
-def _load_tooltips() -> dict:
-    try:
-        BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-
-        path = os.path.join(BASE_DIR, "locale", "tooltips", "item_tooltips.json")
-        with open(os.path.normpath(path), "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return {}
-
-
 class ItemEditor(QWidget):
     def __init__(self, content: dict, project, parent=None):
         super().__init__(parent)
@@ -66,7 +65,6 @@ class ItemEditor(QWidget):
         self.project = project
         self.sprite_path = content.get("sprite", "")
         self.main_window = None
-        self.tooltips = _load_tooltips()
         
 
         # Aktif opsiyonel alanları takip et: key -> widget
@@ -98,7 +96,7 @@ class ItemEditor(QWidget):
         left_layout.setContentsMargins(24, 24, 24, 24)
         left_layout.setSpacing(12)
 
-        title = QLabel("Item Editor")
+        title = QLabel(tr("item_editor.title"))
         title.setStyleSheet("color: #a6e3a1; font-size: 18px; font-weight: bold;")
         left_layout.addWidget(title)
 
@@ -117,9 +115,9 @@ class ItemEditor(QWidget):
         self.basic_form.setSpacing(10)
         self.basic_form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
 
-        self.name_input        = self._make_input("my-item")
-        self.display_name_input = self._make_input("My Item")
-        self.description_input = self._make_input('Description')
+        self.name_input        = self._make_input(tr("item_editor.placeholder_name", "my-item"))
+        self.display_name_input = self._make_input(tr("item_editor.placeholder_display", "My Item"))
+        self.description_input = self._make_input(tr("item_editor.placeholder_desc", "Description"))
 
         self.color_value = content.get("color", "000000")
         self.color_btn = QPushButton(f"  #{self.color_value}")
@@ -134,7 +132,7 @@ class ItemEditor(QWidget):
         self.form_layout.addWidget(basic_form_widget)
 
         # Opsiyonel alanlar bölümü
-        sep = QLabel("── Optional Properties ──")
+        sep = QLabel(tr("item_editor.optional_separator"))
         sep.setStyleSheet("color: #585b70; font-size: 11px; padding-top: 12px;")
         self.form_layout.addWidget(sep)
 
@@ -145,7 +143,7 @@ class ItemEditor(QWidget):
         self.form_layout.addWidget(self.optional_form_widget)
 
         # Add Property butonu
-        self.add_prop_btn = QPushButton("+ Add Property")
+        self.add_prop_btn = QPushButton(tr("item_editor.add_property"))
         self.add_prop_btn.setStyleSheet("""
             QPushButton {
                 background-color: #313244;
@@ -166,7 +164,7 @@ class ItemEditor(QWidget):
         left_layout.addWidget(scroll)
 
         # Save butonu
-        save_btn = QPushButton("Save")
+        save_btn = QPushButton(tr("item_editor.save"))
         save_btn.setFixedHeight(36)
         save_btn.setStyleSheet("""
             QPushButton {
@@ -190,7 +188,7 @@ class ItemEditor(QWidget):
         right_layout.setSpacing(8)
         right_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        sprite_title = QLabel("Sprite")
+        sprite_title = QLabel(tr("item_editor.sprite"))
         sprite_title.setStyleSheet("font-size: 13px; font-weight: bold;")
 
         self.sprite_preview = QLabel()
@@ -203,9 +201,9 @@ class ItemEditor(QWidget):
             color: #585b70;
             font-size: 13px;
         """)
-        self.sprite_preview.setText("No sprite")
+        self.sprite_preview.setText(tr("item_editor.no_sprite"))
 
-        sprite_btn = QPushButton("Load Sprite")
+        sprite_btn = QPushButton(tr("item_editor.load_sprite"))
         sprite_btn.setStyleSheet("""
             QPushButton {
                 background-color: #313244;
@@ -234,7 +232,7 @@ class ItemEditor(QWidget):
         display = PROPERTY_LABELS.get(key, key)
         label = QLabel(f"{display}:")
         label.setStyleSheet("color: #cdd6f4; font-size: 13px; background: transparent;")
-        tip = self.tooltips.get(key, "")
+        tip = tr(f"tooltip.item.{key}", "")
         if tip:
             label.setToolTip(tip)
         return label
@@ -261,6 +259,11 @@ class ItemEditor(QWidget):
         else:  # str
             w = QLineEdit()
             w.setText(str(self.content.get(key, default)))
+            if key == "research":
+                completer = QCompleter(MINDUSTRY_ITEMS, w)
+                completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+                completer.setFilterMode(Qt.MatchFlag.MatchContains)
+                w.setCompleter(completer)
         return w
 
     def _color_btn_style(self, hex_color: str) -> str:
@@ -292,7 +295,7 @@ class ItemEditor(QWidget):
         menu = QMenu(self)
         available = [k for k in OPTIONAL_PROPERTIES if k not in self.active_props]
         if not available:
-            menu.addAction("All properties added").setEnabled(False)
+            menu.addAction(tr("item_editor.all_added")).setEnabled(False)
         for key in available:
             label = PROPERTY_LABELS.get(key, key)
             action = menu.addAction(label)
@@ -378,15 +381,8 @@ class ItemEditor(QWidget):
     def _load_sprite(self):
         path, _ = QFileDialog.getOpenFileName(self, "Select Sprite", "", "Images (*.png)")
         if path:
-            import shutil
-            sprites_dir = os.path.join(self.project.path, "sprites")
-            os.makedirs(sprites_dir, exist_ok=True)
-            filename = os.path.basename(path)
-            dest = os.path.join(sprites_dir, filename)
-            if os.path.abspath(path) != os.path.abspath(dest):
-                shutil.copy2(path, dest)
-            self.sprite_path = dest
-            self._update_sprite_preview(dest)
+            self._sprite_source = path
+            self._update_sprite_preview(path)
 
     def _update_sprite_preview(self, path: str):
         pixmap = QPixmap(path)
@@ -411,15 +407,26 @@ class ItemEditor(QWidget):
 
     def _save(self):
         if not self.name_input.text().strip():
-            QMessageBox.warning(self, "Hata", "Name (ID) boş olamaz.")
+            QMessageBox.warning(self, tr("dialog.error"), tr("item_editor.error_empty_name"))
             return
 
+        item_name = self.name_input.text().strip()
+
         self.content["type"]        = "item"
-        self.content["name"]        = self.name_input.text().strip()
+        self.content["name"]        = item_name
         self.content["displayName"] = self.display_name_input.text().strip()
         self.content["description"] = self.description_input.text().strip()
         self.content["color"]       = self.color_value
-        self.content["sprite"]      = self.sprite_path
+
+        # Sprite'ı doğru konuma kaydet
+        if hasattr(self, "_sprite_source") and self._sprite_source:
+            import shutil
+            sprite_dir = os.path.join(self.project.path, "sprites", "items")
+            os.makedirs(sprite_dir, exist_ok=True)
+            dest = os.path.join(sprite_dir, f"{item_name}.png")
+            shutil.copy2(self._sprite_source, dest)
+            self.sprite_path = dest
+        self.content["sprite"] = self.sprite_path
 
         # Opsiyonel alanlar
         for key in list(self.active_props.keys()):
@@ -463,7 +470,7 @@ class ItemEditor(QWidget):
             self.main_window.grid_view.refresh()
         if self.main_window and hasattr(self.main_window, "editor_window"):
             self.main_window.editor_window.setWindowTitle(
-                f"Item Editor — {self.content['name']}"
+                tr("editor.window_title").format(type="Item", name=self.content["name"])
             )
 
 

@@ -1,0 +1,9 @@
+{
+  "language": "en",
+  "font_family": "cabiri",
+  "font_size": 13,
+  "editor_auto_save": false,
+  "editor_show_tooltips": true,
+  "editor_default_values": true,
+  "theme": "catppuccin_mocha"
+}

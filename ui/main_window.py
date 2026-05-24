@@ -10,37 +10,41 @@ from PyQt6.QtGui import (
     QIcon,
     QDesktopServices,
 )
+from locale.locale_manager import tr, _read_config
 
 class NewModDialog(QDialog):
-    """Yeni mod oluşturma dialog'u."""
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("New Mod")
+        self.setWindowTitle(tr("new_mod.title"))
         self.setMinimumWidth(400)
+
+        config = _read_config()
 
         layout = QFormLayout(self)
 
         self.name_input = QLineEdit()
-        self.name_input.setPlaceholderText("my-mod (tdont make it blank)")
+        self.name_input.setPlaceholderText(tr("new_mod.placeholder_id"))
 
         self.display_name_input = QLineEdit()
-        self.display_name_input.setPlaceholderText("My Mod")
+        self.display_name_input.setPlaceholderText(tr("new_mod.placeholder_display"))
 
         self.author_input = QLineEdit()
-        self.author_input.setPlaceholderText("YourName")
+        self.author_input.setPlaceholderText(tr("new_mod.placeholder_author"))
+        self.author_input.setText(config.get("default_author", ""))
 
         self.description_input = QLineEdit()
-        self.description_input.setPlaceholderText("A cool Mindustry mod")
+        self.description_input.setPlaceholderText(tr("new_mod.placeholder_desc"))
+        self.description_input.setText(config.get("default_desc", ""))
 
-        self.version_input = QLineEdit("1.0")
-        self.min_version_input = QLineEdit("157")
+        self.version_input = QLineEdit(config.get("default_version", "1.0"))
+        self.min_version_input = QLineEdit(config.get("default_min_version", "145"))
 
-        layout.addRow("Mod ID:", self.name_input)
-        layout.addRow("Display Name:", self.display_name_input)
-        layout.addRow("Author:", self.author_input)
-        layout.addRow("Description:", self.description_input)
-        layout.addRow("Version:", self.version_input)
-        layout.addRow("Min Game Version:", self.min_version_input)
+        layout.addRow(tr("new_mod.mod_id"), self.name_input)
+        layout.addRow(tr("new_mod.display_name"), self.display_name_input)
+        layout.addRow(tr("new_mod.author"), self.author_input)
+        layout.addRow(tr("new_mod.description"), self.description_input)
+        layout.addRow(tr("new_mod.version"), self.version_input)
+        layout.addRow(tr("new_mod.min_game_version"), self.min_version_input)
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok |
@@ -53,10 +57,10 @@ class NewModDialog(QDialog):
     def _on_accept(self):
         name = self.name_input.text().strip()
         if not name:
-            QMessageBox.warning(self, "Error", "Mod ID cannot be empty.")
+            QMessageBox.warning(self, tr("dialog.error"), tr("new_mod.error_empty"))
             return
         if " " in name:
-            QMessageBox.warning(self, "Error", "Mod ID cannot contain spaces.")
+            QMessageBox.warning(self, tr("dialog.error"), tr("new_mod.error_spaces"))
             return
         self.accept()
 
@@ -75,7 +79,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.project: Project | None = None
-        self.setWindowTitle("E.C.V.A.M.M.")
+        self.setWindowTitle(tr("app.window_title"))
         self.resize(1280, 720)
 
         self._show_startup()
@@ -87,21 +91,21 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(central)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        label = QLabel("E.C.V.A.M.M.")
+        label = QLabel(tr("app.title"))
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         label.setStyleSheet("""
             font-size: 40px;
             font-weight: bold;
         """)
 
-        sub_label2 = QLabel("Extremely Cool Very Awesome Mod Maker")
+        sub_label2 = QLabel(tr("app.subtitle"))
         sub_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         sub_label2.setStyleSheet("""
             font-size: 16px;
             color: #dcdcdc;
         """)
 
-        sub_label = QLabel("Create or open a Mindustry mod to get started.")
+        sub_label = QLabel(tr("app.description"))
         sub_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         sub_label.setStyleSheet("""
             font-size: 13px;
@@ -109,19 +113,16 @@ class MainWindow(QMainWindow):
         """)
 
         from PyQt6.QtWidgets import QPushButton
-        btn_new = QPushButton("New Mod")
-        btn_open = QPushButton("Open Mod")
-        btn_setting = QPushButton("Settings")
+        btn_new = QPushButton(tr("startup.new_mod"))
+        btn_open = QPushButton(tr("startup.open_mod"))
+        btn_setting = QPushButton(tr("startup.settings"))
         btn_new.setFixedWidth(200)
         btn_open.setFixedWidth(200)
         btn_setting.setFixedWidth(200)
 
         btn_new.clicked.connect(self._new_mod)
         btn_open.clicked.connect(self._open_mod)
-        btn_setting.clicked.connect(lambda: QMessageBox.critical(
-                self, "Error",
-                " It will added soon "
-        ))
+        btn_setting.clicked.connect(self._open_settings)
 
         layout.addWidget(label)
         layout.addWidget(sub_label2)
@@ -159,8 +160,8 @@ class MainWindow(QMainWindow):
         ))
 
         btn_docs.clicked.connect(lambda: QMessageBox.critical(
-                self, "Error",
-                " It will added soon "
+                self, tr("dialog.error"),
+                tr("dialog.not_ready")
         ))
 
         btn_credits.clicked.connect(lambda: InfoDialog().exec())
@@ -171,12 +172,12 @@ class MainWindow(QMainWindow):
         bottom_layout.addWidget(btn_credits)
         bottom_layout.addWidget(btn_docs)
         
-        btn_discord.setToolTip("Join our Discord server")
-        btn_github.setToolTip("Open GitHub repository")
-        btn_credits.setToolTip("Credits")
-        btn_docs.setToolTip("Documentation")
-        btn_new.setToolTip("Create a new mod")
-        btn_open.setToolTip("Open a mod for edit")
+        btn_discord.setToolTip(tr("tooltip.discord"))
+        btn_github.setToolTip(tr("tooltip.github"))
+        btn_credits.setToolTip(tr("tooltip.credits"))
+        btn_docs.setToolTip(tr("tooltip.docs"))
+        btn_new.setToolTip(tr("tooltip.new_mod"))
+        btn_open.setToolTip(tr("tooltip.open_mod"))
         
         self.setStyleSheet("""
         QToolTip {
@@ -196,9 +197,22 @@ class MainWindow(QMainWindow):
         layout.addLayout(bottom_layout)
         
 
+    def _open_settings(self):
+        from ui.settings import SettingsDialog
+        dialog = SettingsDialog(self)
+        dialog.exec()
+        if dialog.language_changed:
+            self._refresh_ui()
+
+    def _refresh_ui(self):
+        if self.project is None:
+            self._show_startup()
+        else:
+            self._load_main_ui()
+
     def _new_mod(self):
 
-        base_path = QFileDialog.getExistingDirectory(self, "Select folder to create mod in")
+        base_path = QFileDialog.getExistingDirectory(self, tr("select.folder_create"))
         if not base_path:
             return
 
@@ -211,28 +225,72 @@ class MainWindow(QMainWindow):
         project = create_new_project(base_path, mod_info)
 
         if project is None:
-            QMessageBox.critical(self, "Error", "Mod could not be created.")
+            QMessageBox.critical(self, tr("dialog.error"), tr("error.mod_create_failed"))
             return
 
         self.project = project
         self._load_main_ui()
 
     def _open_mod(self):
-        path = QFileDialog.getExistingDirectory(self, "Select mod folder")
+        path = QFileDialog.getExistingDirectory(self, tr("select.folder_open"))
         if not path:
             return
 
+        from core.mod_structure import is_valid_mod
+        import os
+
         project = Project()
-        if not project.load(path):
-            QMessageBox.critical(
-                self, "Error",
-                "This folder is not a valid Ecvamm mod.\n"
-                "Only mods created with Ecvamm can be opened."
-            )
+        if project.load(path):
+            self.project = project
+            self._load_main_ui()
             return
 
+        # Kurtarma: waypoint'ler var mı?
+        from core.project import Project as P
+        waypoints = P.list_waypoints(path)
+        if waypoints:
+            reply = QMessageBox.question(
+                self, tr("dialog.recovery_title"),
+                tr("dialog.recovery_waypoint_ask"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                from ui.waypoint_dialog import WaypointDialog
+                dummy = P()
+                dummy.path = path
+                dialog = WaypointDialog(dummy, self)
+                if dialog.exec() == QDialog.DialogCode.Accepted and dialog.restored_project:
+                    self.project = dialog.restored_project
+                    self._load_main_ui()
+                    return
+
+        # Kurtarma: mod.hjson'dan tara
+        mod_hjson_path = os.path.join(path, "mod.hjson")
+        if os.path.exists(mod_hjson_path):
+            reply = QMessageBox.question(
+                self, tr("dialog.recovery_title"),
+                tr("dialog.recovery_ask"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                from core.project import recover_project
+                project = recover_project(path)
+                if project is not None:
+                    self.project = project
+                    self._load_main_ui()
+                    return
+
+        QMessageBox.critical(
+            self, tr("dialog.error"),
+            tr("error.invalid_mod")
+        )
+
+    def _apply_restored_project(self, project):
         self.project = project
         self._load_main_ui()
+        QMessageBox.information(self, tr("dialog.saved"), tr("waypoint.restored"))
 
     def _load_main_ui(self):
         from ui.top_bar import TopBar
@@ -250,6 +308,8 @@ class MainWindow(QMainWindow):
         self.grid_view = GridView(self.project)
         self.bottom_bar = BottomBar(self.project)
 
+        self.top_bar.delete_toggle.toggled.connect(self.grid_view.set_delete_mode)
+
         layout.addWidget(self.top_bar)
         layout.addWidget(self.grid_view, stretch=1)
         layout.addWidget(self.bottom_bar)
@@ -263,15 +323,28 @@ class MainWindow(QMainWindow):
         editors = {
             "item": ItemEditor,
             "block": BlockEditor,
+            "wall": BlockEditor,
+            "floor": BlockEditor,
+            "turret": BlockEditor,
+            "conveyor": BlockEditor,
+            "crafter": BlockEditor,
         }
 
         editor_class = editors.get(content_type)
         if editor_class is None:
-            QMessageBox.information(self, "Coming Soon", f"{content_type} editor is not available yet.")
+            QMessageBox.information(
+                self, tr("dialog.coming_soon"),
+                tr("editor.not_available").format(type=content_type)
+            )
             return
 
         self.editor_window = QWidget()
-        self.editor_window.setWindowTitle(f"{content_type.capitalize()} Editor — {content.get('name', 'Unnamed')}")
+        self.editor_window.setWindowTitle(
+            tr("editor.window_title").format(
+                type=content_type.capitalize(),
+                name=content.get("name", tr("grid.unnamed"))
+            )
+        )
         self.editor_window.resize(900, 600)
 
         layout = QVBoxLayout(self.editor_window)
@@ -287,12 +360,12 @@ class InfoDialog(QDialog):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Credits")
+        self.setWindowTitle(tr("credits.title"))
         self.setFixedSize(250, 120)
 
         layout = QVBoxLayout()
 
-        text = QLabel("Made by Kaviundurs\nThe Ecvamm\nI did here for other updates.")
+        text = QLabel(tr("credits.text"))
         text.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         layout.addWidget(text)

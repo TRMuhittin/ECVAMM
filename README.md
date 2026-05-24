@@ -34,10 +34,11 @@ python main.py
 
 | Feature | Description | Status |
 |---|---|---|
-| Item & Block editor | Fix and improve existing editors | In Progress |
-| Settings system | Configurable settings menu | Planned |
+| Item | fixed | Finised |
+| Block editor | Fix and improve existing editors | In Progress |
+| Settings system | Configurable settings menu | In Progress |
 | In-game content editing | Modify existing game content | Planned |
-| Better UI explanations | Improved tooltips and descriptions | Planned |
+| Better UI explanations | Improved tooltips and descriptions | In Progress |
 | Additional tools | More features and improvements | TBD |
 
 

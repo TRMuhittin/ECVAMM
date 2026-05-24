@@ -2,6 +2,7 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel
 from PyQt6.QtCore import Qt
 from core.project import Project
+from locale.locale_manager import tr
 
 
 class BottomBar(QWidget):
@@ -33,7 +34,10 @@ class BottomBar(QWidget):
 
     def _update_count(self):
         count = len(self.project.contents)
-        self.content_count_label.setText(f"{count} content{'s' if count != 1 else ''}")
+        if count == 1:
+            self.content_count_label.setText(tr("bottom_bar.content_count").format(count=count))
+        else:
+            self.content_count_label.setText(tr("bottom_bar.content_count_plural").format(count=count))
 
     def update(self):
         self.project_label.setText(self.project.display_name or self.project.name)
